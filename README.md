@@ -2,60 +2,63 @@
 quantaxis_webserver
 
 
-QUANTAXIS的持久化及后端解决方案
+QUANTAXIS的后端基类 BASE ON TORNADO
 
 ```
-给了一个demo:  地址  www.yutiansut.com:8010
-当前服务器部署版本: 1.6.2
+current version: 2.0
 
+
+2.0 支持了 tornado 6.1, 方便兼容 jupyterlab 3
+
+2.0是一个不兼容更新, 删除了 1.x 的诸多 handlers, 如需使用之前的版本, 请指定版本安装 pip install quantaxis_webserver<2
 ```
 
-## install
-```
-pip install https://github.com/yutiansut/tornado_http2/archive/master.zip
-pip install tornado==5.1.1
-pip install quantaxis_webserver
-```
 
-## 运行
-
-```
-命令行输入：
-
-quantaxis_webserver
-
-```
-
-## API
+-- support tornado 6.1
 
 
-api参见: [backend_api](./backendapi.md)
+-- 支持 apschedule
 
-## CHANGELOG
-- 1.0 版本  基于原有quantaxisd的功能做移植
 
-- 1.1 
 
-    - 增加http2支持
-    - [] 增加tls, ssl支持
+选择直接 [use template](https://github.com/yutiansut/QUANTAXIS_WEBSERVER/generate) 创建 fork
 
-    - 一个完备的websocket通讯/交易机制
+自行修改你的 schedule
+
+
+### COMPONENTS
+
+
+- QAWebServer.basehandlers.QABaseHandler 
+    - 支持 get/ post 的复写
+
+
+    ```python
     
-- 1.3.3 
-    - 增加windows服务(QUANTAXIS_Webservice)
-    - 对应qadesktop 0.0.7 版本
+    class xxx(QABaseHander):
+        def get(self):
+            pass
 
-- 1.3.4
-    - 改用websocket+ json 的模式进行cs通信
-    - 对应qadesktop 0.0.8 版本
-    
-- 1.3.5
-    - 增加 USERHandler模型, 对应1.2.8+ 的quantaxis QA_USER
+        def post(self):
+            pass
+    ```
 
-- 1.3.6
-    - 部分bug修复/ 对QAUSER的进一步适配
+- QAWebServer.basehandlers.QAWebSocketHandler websocket 基类
 
-- 1.3.7
-    - 随着QAARP模块的完善和修改, QAWEBSERVER需要完整实现QAARP的功能
-    - 支持双登陆模式(model: wechat/password)
-    - TODO: 交易监控
+
+- QAWebServer.schdeulehandler.QASchedulerHandler 定时任务基类
+
+
+    - 本项目使用 TornadoScheduler, 基于 mongodb存储 job 信息
+    - 使用 qaenv 获取 mongodb_ip, mongodb_port 如需修改地址
+        - 使用 docker-compose 预制在系统变量中
+        - 如未使用 docker-compose 自行修改系统环境变量
+            - MONGODB ==> ip 默认 "127.0.0.1"
+            - MONGODBPORT ==> port 默认 27017
+
+
+
+    在初始化 init_scheduler 后, scheduler(Tornado Scheduler)是一个全局变量 可以直接使用(已经初始化在 start_server 函数中)
+
+    复写QASchedulerHandler, 并放置到 handlers 句柄中
+
