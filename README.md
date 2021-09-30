@@ -2,6 +2,9 @@
 quantaxis_webserver
 
 
+## quantaxis_webserver 项目即将被关闭! 本项目将直接合并至 quantaxis2.0 主项目中
+
+
 QUANTAXIS的后端基类 BASE ON TORNADO
 
 ```
